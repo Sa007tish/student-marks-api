@@ -1,18 +1,27 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import json
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Student data directly in the code
-student_data = {
-    "Z": 90,
-    "QmO": 91,
-    "s0t6lf8": 98,
-    "lc3E1QHtgz": 98,
-    "5PzomMY5": 95
-    # Add more students as needed
-}
+def load_student_data():
+    try:
+        # Get absolute path to the JSON file
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        json_path = os.path.join(current_dir, 'q-vercel-python.json')
+        
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+            # Convert list of dicts to a simple name:marks dict
+            return {item['name']: item['marks'] for item in data}
+    except Exception as e:
+        print(f"Error loading data: {str(e)}")
+        return {}
+
+# Load data when the module initializes
+student_data = load_student_data()
 
 @app.route('/api', methods=['GET'])
 def get_marks():
